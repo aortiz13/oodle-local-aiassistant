@@ -1,0 +1,154 @@
+define(['jquery', 'core/ajax', 'core/notification'], function($, ajax, notification) {
+
+    var courseId;
+    var chatWindow, chatButton, messagesArea, input, sendButton, typingIndicator, closeButton;
+
+    // --- Funciones de la UI ---
+
+    var showTyping = function() {
+        typingIndicator.hidden = false;
+        messagesArea.scrollTop = messagesArea.scrollHeight;
+    };
+
+    var hideTyping = function() {
+        typingIndicator.hidden = true;
+    };
+
+    var addMessage = function(content, type = 'bot') {
+        var msgDiv = document.createElement('div');
+        msgDiv.classList.add('ai-message', 'ai-message-' + type);
+        msgDiv.innerHTML = content; // Cuidado con XSS si el contenido no es seguro
+        messagesArea.appendChild(msgDiv);
+        messagesArea.scrollTop = messagesArea.scrollHeight;
+        return msgDiv;
+    };
+
+    var addFeedbackButtons = function(logId, messageElement) {
+        var feedbackDiv = document.createElement('div');
+        feedbackDiv.classList.add('ai-feedback');
+        
+        var helpfulBtn = document.createElement('button');
+        helpfulBtn.classList.add('ai-feedback-btn');
+        helpfulBtn.innerText = '👍'; // Usar strings de idioma sería mejor
+        helpfulBtn.dataset.logid = logId;
+        helpfulBtn.dataset.helpful = '1';
+        
+        var notHelpfulBtn = document.createElement('button');
+        notHelpfulBtn.classList.add('ai-feedback-btn');
+        notHelpfulBtn.innerText = '👎';
+        notHelpfulBtn.dataset.logid = logId;
+        notHelpfulBtn.dataset.helpful = '0';
+
+        feedbackDiv.appendChild(helpfulBtn);
+        feedbackDiv.appendChild(notHelpfulBtn);
+        messageElement.appendChild(feedbackDiv);
+    };
+
+    var toggleChat = function() {
+        var isHidden = chatWindow.hidden;
+        chatWindow.hidden = !isHidden;
+        chatButton.hidden = isHidden;
+        if (isHidden) {
+            input.focus();
+        }
+    };
+
+    // --- Lógica de Eventos ---
+
+    var onSendClick = function() {
+        var question = input.value.trim();
+        if (question === '') {
+            return;
+        }
+
+        addMessage(question, 'user');
+        input.value = '';
+        input.disabled = true;
+        sendButton.disabled = true;
+        showTyping();
+
+        // Llamada AJAX al servicio web de Moodle
+        ajax.call([{
+            methodname: 'local_aiassistant_query',
+            args: {
+                courseid: courseId,
+                question: question
+            },
+            done: function(response) {
+                var messageEl = addMessage(response.answer, 'bot');
+                addFeedbackButtons(response.log_id, messageEl);
+            },
+            fail: function(ex) {
+                notification.add('Error communicating with AI: ' + ex, 'error');
+                addMessage('Sorry, I am having trouble connecting.', 'bot');
+            },
+            always: function() {
+                hideTyping();
+                input.disabled = false;
+                sendButton.disabled = false;
+                input.focus();
+            }
+        }]);
+    };
+
+    var onFeedbackClick = function(e) {
+        var target = e.target.closest('.ai-feedback-btn');
+        if (!target) {
+            return;
+        }
+
+        // Desactivar botones de este grupo
+        var parent = target.parentElement;
+        parent.querySelectorAll('.ai-feedback-btn').forEach(function(btn) {
+            btn.disabled = true;
+            btn.classList.remove('active');
+        });
+        target.classList.add('active');
+
+        // Enviar feedback
+        ajax.call([{
+            methodname: 'local_aiassistant_feedback',
+            args: {
+                logid: target.dataset.logid,
+                helpful: target.dataset.helpful === '1'
+            },
+            done: function() {
+                // Opcional: mostrar un "Gracias"
+            },
+            fail: notification.exception
+        }]);
+    };
+
+    // --- Inicialización ---
+
+    return {
+        init: function(params) {
+            courseId = params.courseid;
+            
+            // Encontrar elementos del DOM
+            chatWindow = document.getElementById('ai-chat-window');
+            chatButton = document.getElementById('ai-chat-button');
+            messagesArea = document.getElementById('ai-chat-messages');
+            input = document.getElementById('ai-chat-input');
+            sendButton = document.getElementById('ai-chat-send');
+            typingIndicator = document.getElementById('ai-chat-typing');
+            closeButton = document.getElementById('ai-chat-close');
+
+            if (!chatWindow) {
+                console.error('AI Assistant DOM not found.');
+                return;
+            }
+
+            // Asignar eventos
+            chatButton.addEventListener('click', toggleChat);
+            closeButton.addEventListener('click', toggleChat);
+            sendButton.addEventListener('click', onSendClick);
+            input.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    onSendClick();
+                }
+            });
+            messagesArea.addEventListener('click', onFeedbackClick);
+        }
+    };
+});

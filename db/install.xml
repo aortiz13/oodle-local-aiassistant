@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="local/aiassistant/db" VERSION="20251028" COMMENT="XMLDB file for Moodle local_aiassistant plugin">
+  <TABLES>
+    <TABLE NAME="local_aiassistant_chat_logs" COMMENT="Logs for AI assistant conversations">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true"/>
+        <FIELD NAME="question" TYPE="text" NOTNULL="true"/>
+        <FIELD NAME="answer" TYPE="text" NOTNULL="true"/>
+        <FIELD NAME="timestamp" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+        <FIELD NAME="helpful" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="null" COMMENT="1 = helpful, 0 = not helpful"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="userid_idx" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFSEEK="id"/>
+        <KEY NAME="courseid_idx" TYPE="foreign" FIELDS="courseid" REFTABLE="course" REFSEEK="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="local_aiassistant_knowledge" COMMENT="Base knowledge for simple AI responses">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="category" TYPE="char" LENGTH="100" NOTNULL="true" DEFAULT="general"/>
+        <FIELD NAME="question_pattern" TYPE="text" NOTNULL="true" COMMENT="Simple phrase or keywords"/>
+        <FIELD NAME="answer" TYPE="text" NOTNULL="true" COMMENT="The canned answer"/>
+        <FIELD NAME="context" TYPE="char" LENGTH="255" NOTNULL="false" COMMENT="Optional context hint"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>
+  </TABLES>
+</XMLDB>
