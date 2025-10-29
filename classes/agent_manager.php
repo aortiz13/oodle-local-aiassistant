@@ -23,7 +23,7 @@ class agent_manager {
     public function handle_question(string $question, string $currenturl = '', string $pagetype = '') {
         // 1. Try to find a simple answer in the local knowledge base
         $answer = $this->db_handler->find_in_knowledge_base($question);
-        $source = 'knowledge_base';
+        $source = 'kb'; // Changed from 'knowledge_base' to 'kb' (alpha type compatible)
 
         // 2. If not found, go to OpenAI
         if (!$answer) {
