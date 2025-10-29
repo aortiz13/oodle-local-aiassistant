@@ -2,7 +2,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir . '/externallib.php');
-require_once($CFG->dirroot . '/local/aiassistant/classes/agent_manager.php');
 
 class local_aiassistant_external extends external_api {
 
@@ -20,25 +19,37 @@ class local_aiassistant_external extends external_api {
      * The actual function to process the query.
      */
     public static function query_agent($courseid, $question) {
-        global $USER;
+        global $USER, $CFG;
         
-        // Validate parameters
-        $params = self::validate_parameters(self::query_agent_parameters(), [
-            'courseid' => $courseid,
-            'question' => $question
-        ]);
-        
-        // Validate context
-        $context = context_course::instance($params['courseid']);
-        self::validate_context($context);
-        
-        // Require login
-        require_login($params['courseid']);
+        try {
+            require_once($CFG->dirroot . '/local/aiassistant/classes/agent_manager.php');
+            
+            // Validate parameters
+            $params = self::validate_parameters(self::query_agent_parameters(), [
+                'courseid' => $courseid,
+                'question' => $question
+            ]);
+            
+            // Validate context
+            $context = context_course::instance($params['courseid']);
+            self::validate_context($context);
+            
+            // Require login
+            require_login($params['courseid']);
 
-        $manager = new \local_aiassistant\agent_manager($USER->id, $params['courseid']);
-        $response = $manager->handle_question($params['question']);
+            $manager = new \local_aiassistant\agent_manager($USER->id, $params['courseid']);
+            $response = $manager->handle_question($params['question']);
 
-        return $response;
+            return $response;
+            
+        } catch (Exception $e) {
+            // Return error as response instead of throwing
+            return [
+                'answer' => 'Error: ' . $e->getMessage(),
+                'log_id' => 0,
+                'source' => 'error'
+            ];
+        }
     }
 
     /**
@@ -62,7 +73,9 @@ class local_aiassistant_external extends external_api {
     }
 
     public static function log_feedback($logid, $helpful) {
-        global $USER, $DB;
+        global $USER, $DB, $CFG;
+        
+        require_once($CFG->dirroot . '/local/aiassistant/classes/agent_manager.php');
         
         // Validate parameters
         $params = self::validate_parameters(self::log_feedback_parameters(), [

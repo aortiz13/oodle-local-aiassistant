@@ -1,24 +1,24 @@
-<div class="local-aiassistant-container">
-    <div id="ai-chat-window" class="ai-chat-window" hidden>
+<div class="local-aiassistant-container" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 99999; background: yellow; padding: 20px;">
+    <h2 style="color: red;">AI CHAT TEST</h2>
+    <div id="ai-chat-window" class="ai-chat-window">
         <div class="ai-chat-header">
-            <span>{{#str}}chat_title, local_aiassistant{{/str}}</span>
+            <span>{{{chat_title}}}</span>
             <button id="ai-chat-close" class="ai-chat-close" aria-label="Close chat">&times;</button>
         </div>
         <div id="ai-chat-messages" class="ai-chat-messages">
             <div class="ai-message ai-message-bot">
-                {{#str}}welcome_message, local_aiassistant{{/str}}
+                {{{welcome_message}}}
             </div>
         </div>
         <div id="ai-chat-typing" class="ai-typing" hidden>
-            <div class="dot-flashing"></div>
-            <span>{{#str}}chat_typing, local_aiassistant{{/str}}</span>
+            <span>{{{chat_typing}}}</span>
         </div>
         <div class="ai-chat-input-area">
-            <input type="text" id="ai-chat-input" placeholder="{{#str}}chat_input_placeholder, local_aiassistant{{/str}}">
-            <button id="ai-chat-send" class="ai-chat-send" aria-label="Send">{{#str}}chat_send, local_aiassistant{{/str}}</button>
+            <input type="text" id="ai-chat-input" placeholder="{{{chat_input_placeholder}}}">
+            <button id="ai-chat-send" class="ai-chat-send" aria-label="Send">{{{chat_send}}}</button>
         </div>
     </div>
-    <button id="ai-chat-button" class="ai-chat-button" aria-label="Open AI Assistant">
-        ?
+    <button id="ai-chat-button" class="ai-chat-button" aria-label="Open AI Assistant" style="background: red; color: white; padding: 20px; font-size: 20px;">
+        💬 CLICK AQUI
     </button>
 </div>
