@@ -7,7 +7,7 @@
 
 define(['jquery', 'core/ajax', 'core/notification'], function($, ajax, notification) {
 
-    var courseId;
+    var courseId, wwwroot, currentUrl, pageType;
     var chatWindow, chatButton, messagesArea, input, sendButton, typingIndicator, closeButton;
 
     // --- Funciones de la UI ---
@@ -82,7 +82,9 @@ define(['jquery', 'core/ajax', 'core/notification'], function($, ajax, notificat
             methodname: 'local_aiassistant_query',
             args: {
                 courseid: courseId,
-                question: question
+                question: question,
+                currenturl: currentUrl || '',
+                pagetype: pageType || ''
             },
             done: function(response) {
                 console.log('[AI Assistant] Response received:', response);
@@ -145,7 +147,10 @@ define(['jquery', 'core/ajax', 'core/notification'], function($, ajax, notificat
     return {
         init: function(params) {
             courseId = params.courseid;
-            
+            wwwroot = params.wwwroot || '';
+            currentUrl = params.currenturl || '';
+            pageType = params.pagetype || '';
+
             // Encontrar elementos del DOM
             chatWindow = document.getElementById('ai-chat-window');
             chatButton = document.getElementById('ai-chat-button');

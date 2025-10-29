@@ -12,33 +12,37 @@ class local_aiassistant_external extends external_api {
         return new external_function_parameters([
             'courseid' => new external_value(PARAM_INT, 'The current course ID'),
             'question' => new external_value(PARAM_TEXT, 'The user question'),
+            'currenturl' => new external_value(PARAM_TEXT, 'The current page URL', VALUE_DEFAULT, ''),
+            'pagetype' => new external_value(PARAM_TEXT, 'The current page type', VALUE_DEFAULT, ''),
         ]);
     }
 
     /**
      * The actual function to process the query.
      */
-    public static function query_agent($courseid, $question) {
+    public static function query_agent($courseid, $question, $currenturl = '', $pagetype = '') {
         global $USER, $CFG;
-        
+
         try {
             require_once($CFG->dirroot . '/local/aiassistant/classes/agent_manager.php');
-            
+
             // Validate parameters
             $params = self::validate_parameters(self::query_agent_parameters(), [
                 'courseid' => $courseid,
-                'question' => $question
+                'question' => $question,
+                'currenturl' => $currenturl,
+                'pagetype' => $pagetype
             ]);
-            
+
             // Validate context
             $context = context_course::instance($params['courseid']);
             self::validate_context($context);
-            
+
             // Require login
             require_login($params['courseid']);
 
             $manager = new \local_aiassistant\agent_manager($USER->id, $params['courseid']);
-            $response = $manager->handle_question($params['question']);
+            $response = $manager->handle_question($params['question'], $params['currenturl'], $params['pagetype']);
 
             return $response;
             

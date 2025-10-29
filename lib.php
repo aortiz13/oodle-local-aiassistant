@@ -47,9 +47,19 @@ function local_aiassistant_before_footer() {
     $chat_input_placeholder = get_string('chat_input_placeholder', 'local_aiassistant');
     $chat_send = get_string('chat_send', 'local_aiassistant');
 
-    // Initialize the JavaScript module
+    // Get current page context
+    global $CFG;
+    $current_url = $PAGE->url ? $PAGE->url->out(false) : '';
+    $page_type = $PAGE->pagetype;
+
+    // Initialize the JavaScript module with enhanced context
     $PAGE->requires->js_call_amd('local_aiassistant/chat', 'init', [
-        ['courseid' => $courseid]
+        [
+            'courseid' => $courseid,
+            'wwwroot' => $CFG->wwwroot,
+            'currenturl' => $current_url,
+            'pagetype' => $page_type
+        ]
     ]);
 
     // Render HTML with language strings

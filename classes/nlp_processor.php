@@ -20,16 +20,37 @@ class nlp_processor {
      */
     public function get_response(string $question, object $context, array $chat_history = []) {
         if (empty($this->api_key)) {
-            return get_string('error_noapikey', 'local_aiassistant'); // Deberías añadir esta string
+            return 'Error: No se ha configurado la API key de OpenAI.';
         }
 
         // Replace placeholders in system prompt
         $systemprompt = str_replace('{USERNAME}', $context->username, $this->system_prompt);
         $systemprompt = str_replace('{COURSENAME}', $context->coursename, $systemprompt);
 
+        // Add spatial context
+        $spatial_context = "\n\nCONTEXTO ESPACIAL:\n";
+        $spatial_context .= "- El usuario {$context->username} YA ESTÁ DENTRO de Moodle (no necesita iniciar sesión).\n";
+        $spatial_context .= "- Está actualmente en: {$context->location}\n";
+        $spatial_context .= "- URL base de Moodle: {$context->wwwroot}\n\n";
+
+        $spatial_context .= "URLS IMPORTANTES (úsalas para dar enlaces directos clickeables):\n";
+        foreach ($context->urls as $name => $url) {
+            $spatial_context .= "- {$name}: {$url}\n";
+        }
+
+        $spatial_context .= "\nINSTRUCCIONES IMPORTANTES:\n";
+        $spatial_context .= "1. Cuando des instrucciones, sé DIRECTO y CONTEXTUAL.\n";
+        $spatial_context .= "2. NO digas 'Inicia sesión' - el usuario YA ESTÁ dentro de Moodle.\n";
+        $spatial_context .= "3. SIEMPRE que menciones una página o acción, incluye el enlace completo y clickeable.\n";
+        $spatial_context .= "4. Usa descripciones visuales: 'En la esquina superior derecha', 'el icono de tu foto', etc.\n";
+        $spatial_context .= "5. Ejemplo BUENO: 'Para cambiar tu foto, haz clic en tu nombre arriba a la derecha, ve a tu perfil y luego a Editar perfil: {$context->urls['editar_perfil']}'\n";
+        $spatial_context .= "6. Ejemplo MALO: 'Inicia sesión, ve a tu perfil, busca la opción de editar...'\n";
+
+        $full_prompt = $systemprompt . $spatial_context;
+
         $messages = [];
-        $messages[] = ['role' => 'system', 'content' => $systemprompt];
-        
+        $messages[] = ['role' => 'system', 'content' => $full_prompt];
+
         // TODO: Add chat history to messages array
 
         $messages[] = ['role' => 'user', 'content' => $question];

@@ -20,14 +20,14 @@ class agent_manager {
     /**
      * Handle an incoming question from the user.
      */
-    public function handle_question(string $question) {
+    public function handle_question(string $question, string $currenturl = '', string $pagetype = '') {
         // 1. Try to find a simple answer in the local knowledge base
         $answer = $this->db_handler->find_in_knowledge_base($question);
         $source = 'knowledge_base';
 
         // 2. If not found, go to OpenAI
         if (!$answer) {
-            $context = $this->db_handler->get_user_context($this->userid, $this->courseid);
+            $context = $this->db_handler->get_user_context($this->userid, $this->courseid, $currenturl, $pagetype);
             $answer = $this->nlp_processor->get_response($question, $context);
             $source = 'openai';
         }
