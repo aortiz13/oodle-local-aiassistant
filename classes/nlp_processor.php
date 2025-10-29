@@ -11,7 +11,7 @@ class nlp_processor {
 
     public function __construct() {
         $this->api_key = get_config('local_aiassistant', 'openai_api_key');
-        $this->model = get_config('local_aiassistant', 'openai_model');
+        $this->model = 'gpt-4o-mini';
         $this->system_prompt = get_config('local_aiassistant', 'system_prompt');
     }
 

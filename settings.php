@@ -26,21 +26,7 @@ if ($hassiteconfig) {
         ''
     ));
 
-    // 3. OpenAI Model
-    $models = [
-        'gpt-4o' => 'GPT-4o',
-        'gpt-4-turbo' => 'GPT-4 Turbo',
-        'gpt-3.5-turbo' => 'GPT-3.5 Turbo',
-    ];
-    $settingspage->add(new admin_setting_configselect(
-        'local_aiassistant/openai_model',
-        get_string('config_model', 'local_aiassistant'),
-        get_string('config_model_desc', 'local_aiassistant'),
-        'gpt-3.5-turbo',
-        $models
-    ));
-
-    // 4. System Prompt
+    // 3. System Prompt
     $settingspage->add(new admin_setting_configtextarea(
         'local_aiassistant/system_prompt',
         get_string('config_system_prompt', 'local_aiassistant'),

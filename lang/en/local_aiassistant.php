@@ -9,8 +9,6 @@ $string['config_enable'] = 'Enable AI Assistant';
 $string['config_enable_desc'] = 'Globally enable the floating chat assistant';
 $string['config_apikey'] = 'OpenAI API Key';
 $string['config_apikey_desc'] = 'Enter your API key from OpenAI';
-$string['config_model'] = 'OpenAI Model';
-$string['config_model_desc'] = 'Select the GPT model to use';
 $string['config_system_prompt'] = 'System Prompt';
 $string['config_system_prompt_desc'] = 'The initial context given to the AI. Use {USERNAME} and {COURSENAME} as placeholders.';
 
