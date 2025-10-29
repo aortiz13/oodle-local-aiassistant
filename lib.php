@@ -24,39 +24,53 @@ function local_aiassistant_before_standard_html_head() {
  */
 function local_aiassistant_before_footer() {
     global $PAGE, $COURSE;
-    
+
     // Check if plugin is enabled
     if (!get_config('local_aiassistant', 'enable')) {
         return;
     }
-    
-    // Get course ID safely
-    $courseid = isset($COURSE->id) ? $COURSE->id : 1;
-    
+
+    // Get course ID - prioritize actual course pages, fallback to site
+    $courseid = 1; // Default to site
+    if (isset($COURSE->id) && $COURSE->id > 1) {
+        // We're in a real course (not site home)
+        $courseid = $COURSE->id;
+    } else if ($PAGE->course && $PAGE->course->id > 1) {
+        // Try getting from PAGE object
+        $courseid = $PAGE->course->id;
+    }
+
+    // Get language strings
+    $chat_title = get_string('chat_title', 'local_aiassistant');
+    $welcome_message = get_string('welcome_message', 'local_aiassistant');
+    $chat_typing = get_string('chat_typing', 'local_aiassistant');
+    $chat_input_placeholder = get_string('chat_input_placeholder', 'local_aiassistant');
+    $chat_send = get_string('chat_send', 'local_aiassistant');
+
     // Initialize the JavaScript module
     $PAGE->requires->js_call_amd('local_aiassistant/chat', 'init', [
         ['courseid' => $courseid]
     ]);
-    
-    // Render HTML directly with inline styles as fallback
+
+    // Render HTML with language strings
     echo <<<HTML
 <div class="local-aiassistant-container">
     <div id="ai-chat-window" class="ai-chat-window" hidden>
         <div class="ai-chat-header">
-            <span>AI Assistant</span>
+            <span>{$chat_title}</span>
             <button id="ai-chat-close" class="ai-chat-close" aria-label="Close chat">&times;</button>
         </div>
         <div id="ai-chat-messages" class="ai-chat-messages">
             <div class="ai-message ai-message-bot">
-                Hello! I am your AI assistant. How can I help you with Moodle today?
+                {$welcome_message}
             </div>
         </div>
         <div id="ai-chat-typing" class="ai-typing" hidden>
-            <span>Typing...</span>
+            <span>{$chat_typing}</span>
         </div>
         <div class="ai-chat-input-area">
-            <input type="text" id="ai-chat-input" placeholder="Ask a question about Moodle...">
-            <button id="ai-chat-send" class="ai-chat-send" aria-label="Send">Send</button>
+            <input type="text" id="ai-chat-input" placeholder="{$chat_input_placeholder}">
+            <button id="ai-chat-send" class="ai-chat-send" aria-label="Send">{$chat_send}</button>
         </div>
     </div>
     <button id="ai-chat-button" class="ai-chat-button" aria-label="Open AI Assistant">
