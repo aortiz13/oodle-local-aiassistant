@@ -1,3 +1,10 @@
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
 define(['jquery', 'core/ajax', 'core/notification'], function($, ajax, notification) {
 
     var courseId;
@@ -14,10 +21,11 @@ define(['jquery', 'core/ajax', 'core/notification'], function($, ajax, notificat
         typingIndicator.hidden = true;
     };
 
-    var addMessage = function(content, type = 'bot') {
+    var addMessage = function(content, type) {
+        type = type || 'bot';
         var msgDiv = document.createElement('div');
         msgDiv.classList.add('ai-message', 'ai-message-' + type);
-        msgDiv.innerHTML = content; // Cuidado con XSS si el contenido no es seguro
+        msgDiv.textContent = content;
         messagesArea.appendChild(msgDiv);
         messagesArea.scrollTop = messagesArea.scrollHeight;
         return msgDiv;
@@ -29,7 +37,7 @@ define(['jquery', 'core/ajax', 'core/notification'], function($, ajax, notificat
         
         var helpfulBtn = document.createElement('button');
         helpfulBtn.classList.add('ai-feedback-btn');
-        helpfulBtn.innerText = '👍'; // Usar strings de idioma sería mejor
+        helpfulBtn.innerText = '👍';
         helpfulBtn.dataset.logid = logId;
         helpfulBtn.dataset.helpful = '1';
         
@@ -79,7 +87,7 @@ define(['jquery', 'core/ajax', 'core/notification'], function($, ajax, notificat
                 addFeedbackButtons(response.log_id, messageEl);
             },
             fail: function(ex) {
-                notification.add('Error communicating with AI: ' + ex, 'error');
+                notification.exception(ex);
                 addMessage('Sorry, I am having trouble connecting.', 'bot');
             },
             always: function() {
@@ -109,7 +117,7 @@ define(['jquery', 'core/ajax', 'core/notification'], function($, ajax, notificat
         ajax.call([{
             methodname: 'local_aiassistant_feedback',
             args: {
-                logid: target.dataset.logid,
+                logid: parseInt(target.dataset.logid),
                 helpful: target.dataset.helpful === '1'
             },
             done: function() {
@@ -135,7 +143,6 @@ define(['jquery', 'core/ajax', 'core/notification'], function($, ajax, notificat
             closeButton = document.getElementById('ai-chat-close');
 
             if (!chatWindow) {
-                console.error('AI Assistant DOM not found.');
                 return;
             }
 

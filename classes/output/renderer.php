@@ -1,24 +1,37 @@
 <?php
-namespace local_aiassistant\output;
-
 defined('MOODLE_INTERNAL') || die();
 
-use plugin_renderer_base;
+/**
+ * Injects chat interface into the page footer.
+ */
+function local_aiassistant_before_footer() {
+    global $PAGE, $COURSE;
+    
+    // Check if plugin is enabled
+    if (!get_config('local_aiassistant', 'enable')) {
+        return;
+    }
+    
+    // Don't show on login page or if not logged in
+    if (!isloggedin() || isguestuser()) {
+        return;
+    }
+    
+    // Initialize the JavaScript module
+    $PAGE->requires->js_call_amd('local_aiassistant/chat', 'init', [
+        ['courseid' => $COURSE->id]
+    ]);
+    
+    // Render the chat interface using the output API
+    $output = $PAGE->get_renderer('local_aiassistant');
+    $interface = new \local_aiassistant\output\chat_interface();
+    echo $output->render($interface);
+}
 
 /**
- * El renderizador principal del plugin.
+ * Minimal pluginfile implementation (needed by Moodle, can expand later).
  */
-class renderer extends \core_plugin_renderer {
-
-    /**
-     * Renderiza la interfaz de chat.
-     *
-     * @param chat_interface $interface La clase 'renderable'
-     * @return string HTML renderizado
-     */
-    public function render_chat_interface(\local_aiassistant\output\chat_interface $interface) {
-        // Le dice a Moodle que use 'templates/chat_interface.mustache'
-        // y le pase los datos (aunque estén vacíos).
-        return $this->render_from_template('local_aiassistant/chat_interface', $interface->data);
-    }
+function local_aiassistant_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options = []) {
+    // For now, just deny all requests to files
+    return false;
 }

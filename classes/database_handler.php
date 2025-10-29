@@ -17,8 +17,13 @@ class database_handler {
      * (Esta es una búsqueda simple, se puede mejorar con IA o full-text)
      */
     public function find_in_knowledge_base(string $question) {
-        $sql = "SELECT answer FROM {local_aiassistant_knowledge} WHERE ? LIKE CONCAT('%', question_pattern, '%')";
-        $record = $this->db->get_record_sql($sql, [clean_text($question)], IGNORE_MULTIPLE);
+        // Limpiar la pregunta
+        $clean_question = strtolower(trim($question));
+        
+        // Buscar coincidencias
+        $sql = "SELECT answer FROM {local_aiassistant_knowledge} 
+                WHERE LOWER(?) LIKE CONCAT('%', LOWER(question_pattern), '%')";
+        $record = $this->db->get_record_sql($sql, [$clean_question], IGNORE_MULTIPLE);
         
         return $record ? $record->answer : null;
     }
