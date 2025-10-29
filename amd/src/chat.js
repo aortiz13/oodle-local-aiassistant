@@ -88,18 +88,25 @@ define(['jquery', 'core/ajax', 'core/notification'], function($, ajax, notificat
                 console.log('[AI Assistant] Response received:', response);
                 var messageEl = addMessage(response.answer, 'bot');
                 addFeedbackButtons(response.log_id, messageEl);
+
+                // Re-enable input after success
+                console.log('[AI Assistant] Re-enabling input after success');
+                hideTyping();
+                input.disabled = false;
+                sendButton.disabled = false;
+                console.log('[AI Assistant] Input re-enabled:', !input.disabled);
+                input.focus();
             },
             fail: function(ex) {
                 console.error('[AI Assistant] AJAX failed:', ex);
                 notification.exception(ex);
                 addMessage('Sorry, I am having trouble connecting.', 'bot');
-            },
-            always: function() {
-                console.log('[AI Assistant] Always callback executed - re-enabling input');
+
+                // Re-enable input after failure
+                console.log('[AI Assistant] Re-enabling input after failure');
                 hideTyping();
                 input.disabled = false;
                 sendButton.disabled = false;
-                console.log('[AI Assistant] Input re-enabled:', !input.disabled);
                 input.focus();
             }
         }]);
