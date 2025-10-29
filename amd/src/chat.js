@@ -69,6 +69,8 @@ define(['jquery', 'core/ajax', 'core/notification'], function($, ajax, notificat
             return;
         }
 
+        console.log('[AI Assistant] Sending question:', question);
+        console.log('[AI Assistant] Input disabled:', input.disabled);
         addMessage(question, 'user');
         input.value = '';
         input.disabled = true;
@@ -83,17 +85,21 @@ define(['jquery', 'core/ajax', 'core/notification'], function($, ajax, notificat
                 question: question
             },
             done: function(response) {
+                console.log('[AI Assistant] Response received:', response);
                 var messageEl = addMessage(response.answer, 'bot');
                 addFeedbackButtons(response.log_id, messageEl);
             },
             fail: function(ex) {
+                console.error('[AI Assistant] AJAX failed:', ex);
                 notification.exception(ex);
                 addMessage('Sorry, I am having trouble connecting.', 'bot');
             },
             always: function() {
+                console.log('[AI Assistant] Always callback executed - re-enabling input');
                 hideTyping();
                 input.disabled = false;
                 sendButton.disabled = false;
+                console.log('[AI Assistant] Input re-enabled:', !input.disabled);
                 input.focus();
             }
         }]);
