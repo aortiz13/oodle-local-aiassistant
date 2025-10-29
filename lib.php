@@ -78,6 +78,12 @@ function local_aiassistant_before_footer() {
         <div id="ai-chat-typing" class="ai-typing" hidden>
             <span>{$chat_typing}</span>
         </div>
+        <div id="ai-suggestions" class="ai-suggestions">
+            <button class="ai-suggestion-chip" data-question="¿Dónde veo mis calificaciones?">📊 Calificaciones</button>
+            <button class="ai-suggestion-chip" data-question="¿Cómo subo una tarea?">📝 Subir tarea</button>
+            <button class="ai-suggestion-chip" data-question="¿Cómo cambio mi foto?">📷 Cambiar foto</button>
+            <button class="ai-suggestion-chip" data-question="¿Dónde están mis cursos?">📚 Mis cursos</button>
+        </div>
         <div class="ai-chat-input-area">
             <input type="text" id="ai-chat-input" placeholder="{$chat_input_placeholder}">
             <button id="ai-chat-send" class="ai-chat-send" aria-label="Send">{$chat_send}</button>

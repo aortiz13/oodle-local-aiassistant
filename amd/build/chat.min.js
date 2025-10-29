@@ -8,7 +8,7 @@
 define(['jquery', 'core/ajax', 'core/notification'], function($, ajax, notification) {
 
     var courseId, wwwroot, currentUrl, pageType;
-    var chatWindow, chatButton, messagesArea, input, sendButton, typingIndicator, closeButton;
+    var chatWindow, chatButton, messagesArea, input, sendButton, typingIndicator, closeButton, suggestionsContainer;
 
     // --- Funciones de la UI ---
 
@@ -64,6 +64,24 @@ define(['jquery', 'core/ajax', 'core/notification'], function($, ajax, notificat
 
     // --- Lógica de Eventos ---
 
+    var hideSuggestions = function() {
+        if (suggestionsContainer) {
+            suggestionsContainer.style.display = 'none';
+        }
+    };
+
+    var onSuggestionClick = function(e) {
+        var chip = e.target.closest('.ai-suggestion-chip');
+        if (!chip) {
+            return;
+        }
+        var question = chip.dataset.question;
+        if (question) {
+            input.value = question;
+            onSendClick();
+        }
+    };
+
     var onSendClick = function() {
         var question = input.value.trim();
         if (question === '') {
@@ -77,6 +95,7 @@ define(['jquery', 'core/ajax', 'core/notification'], function($, ajax, notificat
         input.disabled = true;
         sendButton.disabled = true;
         showTyping();
+        hideSuggestions(); // Hide suggestions after first message
 
         // Llamada AJAX al servicio web de Moodle
         ajax.call([{
@@ -160,6 +179,7 @@ define(['jquery', 'core/ajax', 'core/notification'], function($, ajax, notificat
             sendButton = document.getElementById('ai-chat-send');
             typingIndicator = document.getElementById('ai-chat-typing');
             closeButton = document.getElementById('ai-chat-close');
+            suggestionsContainer = document.getElementById('ai-suggestions');
 
             if (!chatWindow) {
                 return;
@@ -175,6 +195,11 @@ define(['jquery', 'core/ajax', 'core/notification'], function($, ajax, notificat
                 }
             });
             messagesArea.addEventListener('click', onFeedbackClick);
+
+            // Evento para sugerencias predefinidas
+            if (suggestionsContainer) {
+                suggestionsContainer.addEventListener('click', onSuggestionClick);
+            }
         }
     };
 });
