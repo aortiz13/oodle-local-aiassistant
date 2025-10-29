@@ -76,7 +76,8 @@ define(['jquery', 'core/ajax', 'core/notification'], function($, ajax, notificat
         showTyping();
 
         // Llamada AJAX al servicio web de Moodle
-        ajax.call([{
+        // ***** CORRECCIÓN AQUÍ: Se quitaron los corchetes [] *****
+        ajax.call({
             methodname: 'local_aiassistant_query',
             args: {
                 courseid: courseId,
@@ -96,7 +97,7 @@ define(['jquery', 'core/ajax', 'core/notification'], function($, ajax, notificat
                 sendButton.disabled = false;
                 input.focus();
             }
-        }]);
+        });
     };
 
     var onFeedbackClick = function(e) {
@@ -114,7 +115,7 @@ define(['jquery', 'core/ajax', 'core/notification'], function($, ajax, notificat
         target.classList.add('active');
 
         // Enviar feedback
-        ajax.call([{
+        ajax.call({ // <-- Aquí también es mejor sin corchetes
             methodname: 'local_aiassistant_feedback',
             args: {
                 logid: parseInt(target.dataset.logid),
@@ -124,7 +125,7 @@ define(['jquery', 'core/ajax', 'core/notification'], function($, ajax, notificat
                 // Opcional: mostrar un "Gracias"
             },
             fail: notification.exception
-        }]);
+        });
     };
 
     // --- Inicialización ---
