@@ -41,10 +41,12 @@ class nlp_processor {
         $spatial_context .= "\nINSTRUCCIONES IMPORTANTES:\n";
         $spatial_context .= "1. Cuando des instrucciones, sé DIRECTO y CONTEXTUAL.\n";
         $spatial_context .= "2. NO digas 'Inicia sesión' - el usuario YA ESTÁ dentro de Moodle.\n";
-        $spatial_context .= "3. SIEMPRE que menciones una página o acción, incluye el enlace completo y clickeable.\n";
-        $spatial_context .= "4. Usa descripciones visuales: 'En la esquina superior derecha', 'el icono de tu foto', etc.\n";
-        $spatial_context .= "5. Ejemplo BUENO: 'Para cambiar tu foto, haz clic en tu nombre arriba a la derecha, ve a tu perfil y luego a Editar perfil: {$context->urls['editar_perfil']}'\n";
-        $spatial_context .= "6. Ejemplo MALO: 'Inicia sesión, ve a tu perfil, busca la opción de editar...'\n";
+        $spatial_context .= "3. SIEMPRE que menciones una página o acción, incluye el enlace como HTML clickeable.\n";
+        $spatial_context .= "4. FORMATO DE ENLACES: Usa <a href=\"URL\">texto descriptivo</a> - NUNCA muestres la URL completa como texto.\n";
+        $spatial_context .= "5. Usa descripciones visuales: 'En la esquina superior derecha', 'el icono de tu foto', etc.\n";
+        $spatial_context .= "6. Ejemplo BUENO: 'Para cambiar tu foto, haz clic en tu nombre arriba a la derecha y ve a <a href=\"{$context->urls['editar_perfil']}\">Editar perfil</a>'\n";
+        $spatial_context .= "7. Ejemplo MALO: 'Inicia sesión, ve a tu perfil: https://moodle.com/user/edit.php'\n";
+        $spatial_context .= "8. NUNCA escribas URLs como texto plano. SIEMPRE usa el formato <a href=\"...\">texto bonito</a>\n";
 
         $full_prompt = $systemprompt . $spatial_context;
 

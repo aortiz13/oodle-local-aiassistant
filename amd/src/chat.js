@@ -25,7 +25,8 @@ define(['jquery', 'core/ajax', 'core/notification'], function($, ajax, notificat
         type = type || 'bot';
         var msgDiv = document.createElement('div');
         msgDiv.classList.add('ai-message', 'ai-message-' + type);
-        msgDiv.textContent = content;
+        // Use innerHTML to support clickable links
+        msgDiv.innerHTML = content;
         messagesArea.appendChild(msgDiv);
         messagesArea.scrollTop = messagesArea.scrollHeight;
         return msgDiv;

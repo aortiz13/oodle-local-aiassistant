@@ -62,6 +62,22 @@
     border-radius: 12px;
     max-width: 80%;
     line-height: 1.4;
+    word-wrap: break-word;
+    word-break: break-word;
+    overflow-wrap: break-word;
+}
+
+/* Links dentro de mensajes */
+.ai-message a {
+    color: #007bff;
+    text-decoration: underline;
+    cursor: pointer;
+    word-break: break-all;
+}
+
+.ai-message a:hover {
+    color: #0056b3;
+    text-decoration: underline;
 }
 
 .ai-message-user {
